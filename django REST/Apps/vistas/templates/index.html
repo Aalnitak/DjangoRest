@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vistas Catalogo</title>
+    <style type="text/css">
+        body {
+            background-image: url(https://previews.123rf.com/images/chuyu/chuyu1506/chuyu150600014/40602358-a-pile-of-container-in-freight-yard-against-a-blue-sky-transport-background.jpg);
+        }
+        .opaback {
+            background-color: rgba(212, 255, 255, 0.85);
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+    </script>
+    <script>
+        $(document).ready(function () {
+            Listar();
+        });
+
+        function Limpiar() {
+            $("#pk").val('');
+            $("#codigoProd").val('');
+            $("#nombreProd").val('');
+            $("#detalleProd").val('');
+            $("#precioProd").val('');
+            $("#fechaIngreso").val('');
+            $("#stock").val('');
+            $("#pcrear").show();
+            $("#peditar").hide();
+        }
+
+        function Listar() {
+            Limpiar();
+            var str = '';
+            $.ajax({
+                url: 'http://127.0.0.1:8000/catalogo/',
+                type: 'get',
+                success: function (datos) {
+                    $.each(datos, function (i, item) {
+                        str += '<tr>';
+                        str += '<td>' + item.codigoProd + '</td>';
+                        str += '<td>' + item.nombreProd + '</td>';
+                        str += '<td>' + item.detalleProd + '</td>';
+                        str += '<td>' + item.precioProd + '</td>';
+                        str += '<td>' + item.fechaIngreso + '</td>';
+                        str += '<td>' + item.stock + '</td>';
+                        str +=
+                            '<td><input class="btn btn-warning" type="button" value="E" onclick="Editar(' +
+                            item.pk + ')"></td>';
+                        str +=
+                            '<td><input class="btn btn-danger" type="button" value="X" onclick="Borrar(' +
+                            item.pk + ')"></td>';
+                        str += '</tr>';
+                    });
+                    $("#listar").html(str);
+                }
+            });
+        }
+
+        function Crear() {
+            var cod = $("#codigoProd").val();
+            var nom = $("#nombreProd").val();
+            var det = $("#detalleProd").val();
+            var pre = $("#precioProd").val();
+            var fec = $("#fechaIngreso").val();
+            var stk = $("#stock").val();
+            $.ajax({
+                url: 'http://127.0.0.1:8000/catalogo/',
+                data: {
+                    codigoProd: cod,
+                    nombreProd: nom,
+                    detalleProd: det,
+                    precioProd: pre,
+                    fechaIngreso: fec,
+                    stock: stk
+                },
+                type: 'post',
+                success: function (datos) {
+                    Listar();
+                }
+            });
+        }
+
+        function Editar(pk) {
+            $("#pcrear").hide();
+            $("#peditar").show();
+            $.ajax({
+                url: 'http://127.0.0.1:8000/catalogo/' + pk + '/',
+                type: 'get',
+                success: function (datos) {
+                    $("#pk").val(datos.pk);
+                    $("#codigoProd").val(datos.codigoProd);
+                    $("#nombreProd").val(datos.nombreProd);
+                    $("#detalleProd").val(datos.detalleProd);
+                    $("#precioProd").val(datos.precioProd);
+                    $("#fechaIngreso").val(datos.fechaIngreso);
+                    $("#stock").val(datos.stock);
+                }
+            });
+        }
+
+        function Update() {
+            var pk = $("#pk").val();
+            var cod = $("#codigoProd").val();
+            var nom = $("#nombreProd").val();
+            var det = $("#detalleProd").val();
+            var pre = $("#precioProd").val();
+            var fec = $("#fechaIngreso").val();
+            var stk = $("#stock").val();
+            $.ajax({
+                url: 'http://127.0.0.1:8000/catalogo/' + pk + '/',
+                data: {
+                    pk: pk,
+                    codigoProd: cod,
+                    nombreProd: nom,
+                    detalleProd: det,
+                    precioProd: pre,
+                    fechaIngreso: fec,
+                    stock: stk
+                },
+                type: 'put',
+                success: function (datos) {
+                    Listar();
+                }
+            });
+        }
+
+        function Borrar(pk) {
+            $.ajax({
+                url: 'http://127.0.0.1:8000/catalogo/' + pk + '/',
+                type: 'delete',
+                success: function (datos) {
+                    Listar();
+                }
+            });
+        }
+    </script>
+</head>
+
+
+<body>
+    <div class="container opaback">
+    <div class="row">
+        <div class="col-sm-12 pb-3">
+            <!-- <h2 class="p-4 text-center">Elias Koop Importaciones</h2>-->
+            <nav class="navbar navbar-light navbar-expand-lg" style="background-color: #e3f2fd;">
+                <a class="navbar-brand" href="#">Sistema de Gestion</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
+                    aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarText">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="{% url 'home' %}">Vistas <span
+                                    class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item">
+
+                            <a class="nav-link" href="/catalogo">Catalogo</a>
+                        </li>
+                    </ul>
+                    <span class="navbar-text">
+                        Elias Koop Importaciones
+                    </span>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <h2>Formulario Producto</h2>
+                <form action="" method="post">
+                    <p>
+                        <label for="pk">PK</label>
+                        <input readonly class="form-control" type="text" name="pk" id="pk">
+                    </p>
+                    <p>
+                        <label for="codigoProd">Codigo Producto</label>
+                        <input class="form-control" type="number" name="codigoProd" id="codigoProd">
+                    </p>
+                    <p>
+                        <label for="nombreProd">Nombre del Producto</label>
+                        <input class="form-control" type="text" name="nombreProd" id="nombreProd">
+                    </p>
+                    <p>
+                        <label for="detalleProd">Detalle del Producto</label>
+                        <input class="form-control" type="text" name="detalleProd" id="detalleProd">
+                    </p>
+                    <p>
+                        <label for="precioProd">precio</label>
+                        <input class="form-control" type="number" name="precioProd" id="precioProd">
+                    </p>
+                    <p>
+                        <label for="fechaIngreso">Fecha de Ingreso</label>
+                        <input class="form-control" type="date" name="fechaIngreso" id="fechaIngreso">
+                    </p>
+                    <p>
+                        <label for="stock">Stock</label>
+                        <input class="form-control" type="number" name="stock" id="stock">
+                    </p>
+                    <p id="pcrear">
+                        <input class="btn btn-primary" type="button" value="Crear" onclick="Crear()">
+                    </p>
+                    <p id="peditar">
+                        <input class="btn btn-primary" type="button" value="Update" onclick="Update()">
+                    </p>
+                </form>
+            </div>
+            <div class="col-md-1"></div>
+            <div class="col-md-7">
+                <h2>Lista de Productos</h2>
+                <br>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr class="table-info">
+                            <td>Codigo</td>
+                            <td>Nombre</td>
+                            <td>Detalle</td>
+                            <td>Precio</td>
+                            <td>Fecha Ingreso</td>
+                            <td>Stock</td>
+                            <td>Editar</td>
+                            <td>Eliminar</td>
+                        </tr>
+                    </thead>
+                    <tbody id="listar"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
